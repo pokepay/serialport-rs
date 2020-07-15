@@ -70,10 +70,21 @@ impl COMPort {
         if handle != INVALID_HANDLE_VALUE {
             let mut com = COMPort::open_from_raw_handle(handle as RawHandle);
             com.port_name = Some(builder.path.clone());
+            COMPort::set_all(&mut com, builder)?;
             Ok(com)
         } else {
             Err(super::error::last_os_error())
         }
+    }
+
+    fn set_all(com: &mut COMPort, builder: &SerialPortBuilder) -> Result<()> {
+        com.set_baud_rate(builder.baud_rate)?;
+        com.set_data_bits(builder.data_bits)?;
+        com.set_flow_control(builder.flow_control)?;
+        com.set_parity(builder.parity)?;
+        com.set_stop_bits(builder.stop_bits)?;
+        com.set_timeout(builder.timeout)?;
+        Ok(())
     }
 
     /// Attempts to clone the `SerialPort`. This allow you to write and read simultaneously from the
